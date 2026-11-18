@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Cívica · Metro de Medellín</title>
+<style>
+:root{
+  --bg:#e9efe9; --ink:#12301f; --muted:#4d6657; --panel:#ffffff; --line:#c9d6cc;
+  --verde:#00a14b; --verde-osc:#006b32; --amarillo:#ffd400; --azul:#0a5fa8; --gris:#f4f6f4;
+  box-sizing:border-box; padding-top:env(safe-area-inset-top,0px); padding-bottom:env(safe-area-inset-bottom,0px);
+}
+@media (prefers-color-scheme:dark){
+  :root:not([data-theme="light"]){--bg:#0f1b14; --ink:#e6f2ea; --muted:#9db3a5; --panel:#17271d; --line:#2a4033;}
+}
+:root[data-theme="dark"]{--bg:#0f1b14; --ink:#e6f2ea; --muted:#9db3a5; --panel:#17271d; --line:#2a4033;}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:"Trebuchet MS","Segoe UI",system-ui,sans-serif;min-height:100vh;display:flex;flex-direction:column;align-items:center;gap:20px;padding:28px 16px}
+h1{font-size:1.25rem;margin:0;font-weight:700}
+p.sub{margin:4px 0 0;color:var(--muted);font-size:.9rem}
+.scene{width:min(92vw,440px);aspect-ratio:1.586;perspective:1400px;cursor:pointer}
+.card{position:relative;width:100%;height:100%;transform-style:preserve-3d;transition:transform .8s cubic-bezier(.3,.7,.2,1)}
+.scene.flipped .card{transform:rotateY(180deg)}
+.face{position:absolute;inset:0;border-radius:5% / 8%;backface-visibility:hidden;-webkit-backface-visibility:hidden;overflow:hidden;box-shadow:0 18px 40px rgba(0,40,20,.35)}
+.front{background:linear-gradient(135deg,var(--verde) 0%,var(--verde-osc) 100%);color:#fff}
+.back{transform:rotateY(180deg);background:var(--gris);color:#1b2a21}
+/* frente */
+.front .wave{position:absolute;inset:0;width:100%;height:100%}
+.logo{position:absolute;top:7%;left:6%;display:flex;align-items:center;gap:8px}
+.logo .m{width:clamp(30px,9vw,42px);aspect-ratio:1;border-radius:50%;background:#fff;color:var(--verde-osc);display:grid;place-items:center;font-weight:900;font-size:clamp(1.1rem,4.5vw,1.6rem)}
+.logo b{font-size:clamp(.8rem,3.4vw,1.05rem);line-height:1.05;letter-spacing:.02em}
+.logo small{display:block;font-weight:400;font-size:.72em;opacity:.9}
+.civica{position:absolute;top:6%;right:6%;text-align:right;font-weight:900;font-size:clamp(1.5rem,7vw,2.3rem);font-style:italic;letter-spacing:-.02em}
+.civica span{color:var(--amarillo)}
+.chip{position:absolute;left:6%;top:38%;width:15%;aspect-ratio:1.25;border-radius:12%;background:linear-gradient(135deg,#f3dd8a,#c9a54b);box-shadow:inset 0 0 0 1px rgba(0,0,0,.25)}
+.chip::before,.chip::after{content:"";position:absolute;background:rgba(0,0,0,.25)}
+.chip::before{left:0;right:0;top:50%;height:1px}.chip::after{top:0;bottom:0;left:50%;width:1px}
+.nfc{position:absolute;left:24%;top:39%;width:7%;opacity:.9}
+.foto{position:absolute;right:6%;top:34%;width:24%;aspect-ratio:3/4;border-radius:8%;background:#fff;border:3px solid #fff;overflow:hidden;display:grid;place-items:center}
+.foto svg{width:100%;height:100%}
+.foto img{width:100%;height:100%;object-fit:cover}
+.datos{position:absolute;left:6%;bottom:8%;right:34%}
+.datos .nombre{font-size:clamp(.9rem,4vw,1.2rem);font-weight:700;text-transform:uppercase;letter-spacing:.04em;overflow-wrap:anywhere}
+.datos .num{font-size:clamp(.8rem,3.4vw,1.05rem);letter-spacing:.14em;margin-top:4px;font-variant-numeric:tabular-nums}
+.tipo{position:absolute;right:6%;bottom:8%;background:var(--amarillo);color:#1b2a21;font-weight:800;font-size:clamp(.65rem,2.8vw,.85rem);padding:5px 12px;border-radius:99px}
+/* reverso */
+.banda{position:absolute;top:10%;left:0;right:0;height:16%;background:#1b2a21}
+.firma{position:absolute;top:32%;left:6%;right:6%;height:14%;background:repeating-linear-gradient(45deg,#fff,#fff 6px,#eef1ee 6px,#eef1ee 12px);border-radius:6px;display:flex;align-items:center;padding:0 10px;font-family:"Brush Script MT","Segoe Script",cursive;font-size:clamp(.9rem,4.2vw,1.3rem);color:#1b2a21}
+.firma i{font-style:normal;font-family:"Trebuchet MS",sans-serif;font-size:.5em;color:#66776c;margin-left:auto}
+.info{position:absolute;top:50%;left:6%;right:6%;font-size:clamp(.55rem,2.5vw,.75rem);line-height:1.45;color:#33473b}
+.barras{position:absolute;bottom:7%;left:6%;height:15%;width:48%}
+.serial{position:absolute;bottom:8%;right:6%;text-align:right;font-size:clamp(.6rem,2.6vw,.8rem);color:#33473b}
+.serial b{display:block;font-size:1.15em;letter-spacing:.1em}
+.franja{position:absolute;bottom:0;left:0;right:0;height:3%;background:linear-gradient(90deg,var(--verde) 60%,var(--amarillo) 60% 80%,var(--azul) 80%)}
+/* controles */
+.panel{width:min(92vw,440px);background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:16px;display:grid;gap:12px}
+.panel label{display:grid;gap:4px;font-size:.82rem;color:var(--muted)}
+.panel input[type=text],.panel select{font:inherit;padding:9px 10px;border-radius:8px;border:1px solid var(--line);background:transparent;color:var(--ink)}
+.panel input:focus-visible,.panel select:focus-visible,button:focus-visible,.scene:focus-visible{outline:3px solid var(--amarillo);outline-offset:2px}
+.fila{display:flex;gap:10px;flex-wrap:wrap}
+button{font:inherit;font-weight:700;padding:10px 16px;border-radius:99px;border:0;background:var(--verde);color:#fff;cursor:pointer}
+button.sec{background:transparent;color:var(--ink);border:1px solid var(--line)}
+@media (prefers-reduced-motion:reduce){.card{transition:none}}
+</style>
+</head>
+<body>
+<header style="text-align:center">
+  <h1>Tu Cívica del Metro de Medellín</h1>
+  <p class="sub">Toca la tarjeta para voltearla</p>
+</header>
+
+<div class="scene" id="scene" tabindex="0" role="button" aria-label="Voltear tarjeta Cívica">
+  <div class="card">
+    <!-- FRENTE -->
+    <div class="face front">
+      <svg class="wave" viewBox="0 0 400 252" preserveAspectRatio="none" aria-hidden="true">
+        <path d="M0 190 C90 150 170 230 270 190 S380 150 400 170 V252 H0Z" fill="rgba(255,255,255,.10)"/>
+        <path d="M0 215 C100 185 180 245 280 212 S380 190 400 200 V252 H0Z" fill="rgba(255,212,0,.22)"/>
+      </svg>
+      <div class="logo"><div class="m">M</div><b>Metro<small>de Medellín</small></b></div>
+      <div class="civica">cívica<span>.</span></div>
+      <div class="chip"></div>
+      <svg class="nfc" viewBox="0 0 40 40" fill="none" stroke="#fff" stroke-width="3" stroke-linecap="round" aria-hidden="true"><path d="M8 8c8 7 8 17 0 24"/><path d="M16 4c11 10 11 22 0 32"/><path d="M24 0c14 13 14 27 0 40"/></svg>
+      <div class="foto" id="foto">
+        <svg viewBox="0 0 60 80" aria-hidden="true"><rect width="60" height="80" fill="#dfe8e2"/><circle cx="30" cy="30" r="13" fill="#9db3a5"/><path d="M4 80c2-22 14-30 26-30s24 8 26 30z" fill="#9db3a5"/></svg>
+      </div>
+      <div class="datos">
+        <div class="nombre" id="vNombre">Samuel</div>
+        <div class="num" id="vNum">0000 0000 0000</div>
+      </div>
+      <div class="tipo" id="vTipo">Personalizada</div>
+    </div>
+    <!-- REVERSO -->
+    <div class="face back">
+      <div class="banda"></div>
+      <div class="firma"><span id="vFirma">Samuel</span><i>Firma</i></div>
+      <div class="info">
+        Esta tarjeta es personal e intransferible. Recárgala en estaciones, puntos autorizados o en la app.
+        Si la pierdes, repórtala para bloquear el saldo.<br>
+        <b>Línea de atención: (604) 444 95 48</b> · metrodemedellin.gov.co
+      </div>
+      <svg class="barras" id="barras" viewBox="0 0 120 30" preserveAspectRatio="none" aria-hidden="true"></svg>
+      <div class="serial">Serial<b id="vSerial">00000000</b></div>
+      <div class="franja"></div>
+    </div>
+  </div>
+</div>
+
+<div class="panel">
+  <label>Nombre
+    <input type="text" id="inNombre" value="Samuel" maxlength="28" autocomplete="off">
+  </label>
+  <label>Tipo de tarjeta
+    <select id="inTipo">
+      <option>Personalizada</option>
+      <option>Estudiante</option>
+      <option>Adulto mayor</option>
+      <option>Básica</option>
+    </select>
+  </label>
+  <label>Tu foto (opcional)
+    <input type="file" id="inFoto" accept="image/*">
+  </label>
+  <div class="fila">
+    <button id="btnVoltear">Voltear</button>
+    <button id="btnNuevo" class="sec">Nuevo número</button>
+  </div>
+</div>
+
+<script>
+(function(){
+  var scene=document.getElementById('scene');
+  function voltear(){scene.classList.toggle('flipped');}
+  scene.addEventListener('click',voltear);
+  scene.addEventListener('keydown',function(e){if(e.key==='Enter'||e.key===' '){e.preventDefault();voltear();}});
+  document.getElementById('btnVoltear').addEventListener('click',voltear);
+
+  function rnd(n){var s='';for(var i=0;i<n;i++)s+=Math.floor(Math.random()*10);return s;}
+  function nuevo(){
+    var n=rnd(12);
+    document.getElementById('vNum').textContent=n.replace(/(\d{4})(?=\d)/g,'$1 ');
+    var ser=rnd(8);
+    document.getElementById('vSerial').textContent=ser;
+    // código de barras generado a partir del serial
+    var svg=document.getElementById('barras'),x=0,html='';
+    var seed=parseInt(ser,10)||1;
+    while(x<118){
+      seed=(seed*1103515245+12345)&0x7fffffff;
+      var w=1+(seed%3),gap=1+((seed>>3)%2);
+      html+='<rect x="'+x+'" y="0" width="'+w+'" height="30" fill="#1b2a21"/>';
+      x+=w+gap;
+    }
+    svg.innerHTML=html;
+  }
+  document.getElementById('btnNuevo').addEventListener('click',nuevo);
+  nuevo();
+
+  document.getElementById('inNombre').addEventListener('input',function(e){
+    var v=e.target.value||'Tu nombre';
+    document.getElementById('vNombre').textContent=v;
+    document.getElementById('vFirma').textContent=v;
+  });
+  document.getElementById('inTipo').addEventListener('change',function(e){
+    document.getElementById('vTipo').textContent=e.target.value;
+  });
+  document.getElementById('inFoto').addEventListener('change',function(e){
+    var f=e.target.files&&e.target.files[0];
+    if(!f)return;
+    var r=new FileReader();
+    r.onload=function(){
+      var box=document.getElementById('foto');
+      box.innerHTML='';
+      var img=document.createElement('img');
+      img.src=r.result;img.alt='Foto del titular';
+      box.appendChild(img);
+    };
+    r.readAsDataURL(f);
+  });
+})();
+</script>
+</body>
+</html>

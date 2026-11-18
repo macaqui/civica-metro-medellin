@@ -61,6 +61,15 @@ p.sub{margin:4px 0 0;color:var(--muted);font-size:.9rem}
 .fila{display:flex;gap:10px;flex-wrap:wrap}
 button{font:inherit;font-weight:700;padding:10px 16px;border-radius:99px;border:0;background:var(--verde);color:#fff;cursor:pointer}
 button.sec{background:transparent;color:var(--ink);border:1px solid var(--line)}
+/* lista de tarjetas guardadas */
+.panel h2{font-size:.95rem;margin:0}
+.lista{list-style:none;margin:0;padding:0;display:grid;gap:8px}
+.lista li{border:1px solid var(--line);border-radius:10px;padding:10px;display:grid;gap:8px}
+.lista .nombre-lista{font-weight:700}
+.lista .meta{color:var(--muted);font-size:.8rem;font-variant-numeric:tabular-nums}
+.lista .aviso{color:#b3261e;font-size:.85rem}
+.botones-lista{display:flex;gap:8px}
+.botones-lista button{padding:6px 12px;font-size:.8rem}
 @media (prefers-reduced-motion:reduce){.card{transition:none}}
 </style>
 </head>
@@ -128,6 +137,11 @@ button.sec{background:transparent;color:var(--ink);border:1px solid var(--line)}
   </div>
 </div>
 
+<div class="panel">
+  <h2>Tarjetas guardadas</h2>
+  <ul class="lista" id="listaTarjetas"></ul>
+</div>
+
 <script>
 (function(){
   var scene=document.getElementById('scene');
@@ -137,11 +151,7 @@ button.sec{background:transparent;color:var(--ink);border:1px solid var(--line)}
   document.getElementById('btnVoltear').addEventListener('click',voltear);
 
   function rnd(n){var s='';for(var i=0;i<n;i++)s+=Math.floor(Math.random()*10);return s;}
-  function nuevo(){
-    var n=rnd(12);
-    document.getElementById('vNum').textContent=n.replace(/(\d{4})(?=\d)/g,'$1 ');
-    var ser=rnd(8);
-    document.getElementById('vSerial').textContent=ser;
+  function pintarBarras(ser){
     // código de barras generado a partir del serial
     var svg=document.getElementById('barras'),x=0,html='';
     var seed=parseInt(ser,10)||1;
@@ -153,8 +163,92 @@ button.sec{background:transparent;color:var(--ink);border:1px solid var(--line)}
     }
     svg.innerHTML=html;
   }
+  function generar(){
+    var n=rnd(12);
+    document.getElementById('vNum').textContent=n.replace(/(\d{4})(?=\d)/g,'$1 ');
+    var ser=rnd(8);
+    document.getElementById('vSerial').textContent=ser;
+    pintarBarras(ser);
+    return {numero:n,serial:ser};
+  }
+  function nuevo(){
+    var g=generar();
+    var nombre=document.getElementById('inNombre').value||'Samuel';
+    var tipo=document.getElementById('inTipo').value;
+    fetch('/api/tarjetas',{
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({nombre:nombre,tipo:tipo,numero:g.numero,serial:g.serial})
+    }).then(function(){cargar();}).catch(function(){aviso('No se pudo conectar con el servidor');});
+  }
   document.getElementById('btnNuevo').addEventListener('click',nuevo);
-  nuevo();
+  generar();
+
+  var lista=document.getElementById('listaTarjetas');
+  function aviso(texto){
+    lista.innerHTML='';
+    var li=document.createElement('li');
+    li.className='aviso';
+    li.textContent=texto;
+    lista.appendChild(li);
+  }
+  function pintar(tarjetas){
+    lista.innerHTML='';
+    if(!tarjetas.length){
+      aviso('Todavía no hay tarjetas guardadas.');
+      return;
+    }
+    tarjetas.forEach(function(t){
+      var li=document.createElement('li');
+      var info=document.createElement('div');
+      var nom=document.createElement('div');
+      nom.className='nombre-lista';
+      nom.textContent=t.nombre;
+      var meta=document.createElement('div');
+      meta.className='meta';
+      meta.textContent=t.tipo+' · '+t.numero;
+      info.appendChild(nom);
+      info.appendChild(meta);
+      var botones=document.createElement('div');
+      botones.className='botones-lista';
+      var bCargar=document.createElement('button');
+      bCargar.type='button';
+      bCargar.textContent='Cargar';
+      bCargar.addEventListener('click',function(){cargarEnTarjeta(t);});
+      var bBorrar=document.createElement('button');
+      bBorrar.type='button';
+      bBorrar.className='sec';
+      bBorrar.textContent='Borrar';
+      bBorrar.addEventListener('click',function(){borrar(t.id);});
+      botones.appendChild(bCargar);
+      botones.appendChild(bBorrar);
+      li.appendChild(info);
+      li.appendChild(botones);
+      lista.appendChild(li);
+    });
+  }
+  function cargar(){
+    fetch('/api/tarjetas')
+      .then(function(r){return r.json();})
+      .then(pintar)
+      .catch(function(){aviso('No se pudo conectar con el servidor');});
+  }
+  function cargarEnTarjeta(t){
+    document.getElementById('inNombre').value=t.nombre;
+    document.getElementById('vNombre').textContent=t.nombre;
+    document.getElementById('vFirma').textContent=t.nombre;
+    document.getElementById('inTipo').value=t.tipo;
+    document.getElementById('vTipo').textContent=t.tipo;
+    document.getElementById('vNum').textContent=t.numero.replace(/(\d{4})(?=\d)/g,'$1 ');
+    document.getElementById('vSerial').textContent=t.serial;
+    pintarBarras(t.serial);
+  }
+  function borrar(id){
+    fetch('/api/tarjetas/'+id,{method:'DELETE'})
+      .then(function(){cargar();})
+      .catch(function(){aviso('No se pudo conectar con el servidor');});
+  }
+  cargar();
 
   document.getElementById('inNombre').addEventListener('input',function(e){
     var v=e.target.value||'Tu nombre';

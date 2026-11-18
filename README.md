@@ -2,6 +2,8 @@
 
 Simulador de la **tarjeta Cívica del Metro de Medellín** hecho con **HTML, CSS y JavaScript puro** (sin frameworks).
 
+> 🌐 **En vivo:** <https://macaqui.github.io/civica-metro-medellin/>
+
 ## Qué hace
 
 - Muestra una tarjeta personalizada con **volteo 3D** (frente y reverso).

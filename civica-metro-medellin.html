@@ -144,6 +144,8 @@ button.sec{background:transparent;color:var(--ink);border:1px solid var(--line)}
 
 <script>
 (function(){
+  // En local y en Render la API esta en el mismo servidor; en GitHub Pages uso la de Render.
+  var API=(location.hostname==='localhost'||location.hostname==='127.0.0.1'||location.hostname.indexOf('onrender.com')!==-1)?'':'https://civica-metro-medellin.onrender.com';
   var scene=document.getElementById('scene');
   function voltear(){scene.classList.toggle('flipped');}
   scene.addEventListener('click',voltear);
@@ -175,7 +177,7 @@ button.sec{background:transparent;color:var(--ink);border:1px solid var(--line)}
     var g=generar();
     var nombre=document.getElementById('inNombre').value||'Samuel';
     var tipo=document.getElementById('inTipo').value;
-    fetch('/api/tarjetas',{
+    fetch(API+'/api/tarjetas',{
       method:'POST',
       headers:{'Content-Type':'application/json'},
       body:JSON.stringify({nombre:nombre,tipo:tipo,numero:g.numero,serial:g.serial})
@@ -228,7 +230,7 @@ button.sec{background:transparent;color:var(--ink);border:1px solid var(--line)}
     });
   }
   function cargar(){
-    fetch('/api/tarjetas')
+    fetch(API+'/api/tarjetas')
       .then(function(r){return r.json();})
       .then(pintar)
       .catch(function(){aviso('No se pudo conectar con el servidor');});
@@ -244,7 +246,7 @@ button.sec{background:transparent;color:var(--ink);border:1px solid var(--line)}
     pintarBarras(t.serial);
   }
   function borrar(id){
-    fetch('/api/tarjetas/'+id,{method:'DELETE'})
+    fetch(API+'/api/tarjetas/'+id,{method:'DELETE'})
       .then(function(){cargar();})
       .catch(function(){aviso('No se pudo conectar con el servidor');});
   }

@@ -1,0 +1,112 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Cívica Metro de Medellín · Samuel Hincapié</title>
+<meta name="description" content="Simulador de la tarjeta Cívica del Metro de Medellín hecho con HTML, CSS y JavaScript puro.">
+<style>
+  :root {
+    --fondo: #0d1117;
+    --panel: #161b22;
+    --borde: #2a3341;
+    --texto: #e6edf3;
+    --tenue: #9aa7b8;
+    --acento: #46d1a0;
+  }
+
+  * { box-sizing: border-box; }
+
+  body {
+    margin: 0;
+    min-height: 100vh;
+    padding: 3rem 1.25rem 4rem;
+    background:
+      radial-gradient(60rem 30rem at 50% -10%, #1b2430 0%, transparent 70%),
+      var(--fondo);
+    color: var(--texto);
+    font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+    line-height: 1.6;
+  }
+
+  .envoltura { width: min(56rem, 100%); margin: 0 auto; }
+
+  .eyebrow {
+    margin: 0 0 .35rem;
+    font-size: .8rem;
+    letter-spacing: .14em;
+    text-transform: uppercase;
+    color: var(--acento);
+  }
+
+  h1 { margin: 0 0 .5rem; font-size: clamp(1.7rem, 4vw, 2.4rem); line-height: 1.2; }
+
+  .lead { margin: 0 0 2.25rem; max-width: 46rem; color: var(--tenue); }
+
+  .tarjetas { display: grid; gap: 1rem; grid-template-columns: repeat(auto-fit, minmax(17rem, 1fr)); }
+
+  .tarjeta {
+    display: flex;
+    flex-direction: column;
+    gap: .5rem;
+    padding: 1.35rem;
+    border: 1px solid var(--borde);
+    border-radius: .9rem;
+    background: var(--panel);
+    color: inherit;
+    text-decoration: none;
+    transition: transform .15s ease, border-color .15s ease;
+  }
+
+  .tarjeta:hover, .tarjeta:focus-visible {
+    transform: translateY(-3px);
+    border-color: var(--acento);
+    outline: none;
+  }
+
+  .etiqueta {
+    align-self: flex-start;
+    padding: .15rem .55rem;
+    border-radius: 999px;
+    background: rgba(70, 209, 160, .12);
+    color: var(--acento);
+    font-size: .72rem;
+    letter-spacing: .06em;
+    text-transform: uppercase;
+  }
+
+  .tarjeta h2 { margin: 0; font-size: 1.15rem; }
+  .tarjeta p { margin: 0; color: var(--tenue); font-size: .95rem; }
+
+  .ir { margin-top: .35rem; color: var(--acento); font-size: .9rem; font-weight: 600; }
+
+  footer { margin-top: 2.5rem; color: var(--tenue); font-size: .85rem; }
+  footer a { color: var(--acento); }
+</style>
+</head>
+<body>
+  <div class="envoltura">
+    <p class="eyebrow">Samuel Hincapié · SENA</p>
+    <h1>Cívica — Metro de Medellín</h1>
+    <p class="lead">
+      Simulador de la tarjeta Cívica hecho con <strong>HTML, CSS y JavaScript puro</strong>, sin
+      frameworks. Genera el número de tarjeta, el serial y un código de barras, y permite
+      escribir un nombre para verlo en la tarjeta y en la firma.
+    </p>
+
+    <div class="tarjetas">
+      <a class="tarjeta" href="civica-metro-medellin.html">
+        <span class="etiqueta">HTML · CSS · JS</span>
+        <h2>Simulador de la tarjeta</h2>
+        <p>Volteo 3D, datos generados y campo de nombre editable.</p>
+        <span class="ir">Abrir ejercicio →</span>
+      </a>
+    </div>
+
+    <footer>
+      Proyecto de la Técnica en Desarrollo de Software ·
+      <a href="https://github.com/macaqui/civica-metro-medellin">código en GitHub</a>
+    </footer>
+  </div>
+</body>
+</html>
